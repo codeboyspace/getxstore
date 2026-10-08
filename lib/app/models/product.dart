@@ -58,6 +58,42 @@ class Product {
     );
   }
 
+  Map<String, dynamic> toStorageMap() => {
+    'id': id,
+    'title': title,
+    'description': description,
+    'category': category,
+    'price': price,
+    'discountPercentage': discountPercentage,
+    'rating': rating,
+    'stock': stock,
+    'brand': brand,
+    'thumbnail': thumbnail,
+    'images': images,
+    'reviews': reviews.map((review) => review.toStorageMap()).toList(),
+  };
+
+  factory Product.fromStorageMap(Map<String, dynamic> map) {
+    return Product(
+      id: map['id'] as int,
+      title: map['title'] as String,
+      description: map['description'] as String,
+      category: map['category'] as String,
+      price: _parseDouble(map['price']),
+      discountPercentage: _parseDouble(map['discountPercentage']),
+      rating: _parseDouble(map['rating']),
+      stock: map['stock'] as int,
+      brand: map['brand'] as String,
+      thumbnail: map['thumbnail'] as String,
+      images: (map['images'] as List<dynamic>).cast<String>(),
+      reviews: (map['reviews'] as List<dynamic>)
+          .map(
+            (review) => Review.fromJson(Map<String, dynamic>.from(review as Map)),
+          )
+          .toList(),
+    );
+  }
+
   static double _parseDouble(dynamic value) {
     if (value is num) return value.toDouble();
     return double.tryParse(value.toString()) ?? 0.0;
@@ -82,4 +118,10 @@ class Review {
       reviewerName: (json['reviewerName'] ?? '').toString(),
     );
   }
+
+  Map<String, dynamic> toStorageMap() => {
+    'rating': rating,
+    'comment': comment,
+    'reviewerName': reviewerName,
+  };
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:getx/app/controller/wishlist_controller.dart';
 import 'package:getx/app/controller/product_details_controller.dart';
 import 'package:getx/app/views/widgets/app_network_image.dart';
 import 'package:getx/app/views/widgets/quantity_stepper.dart';
@@ -11,6 +12,7 @@ class ProductDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ProductDetailsController>();
+    final wishlist = Get.find<WishlistController>();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -53,6 +55,23 @@ class ProductDetailsView extends StatelessWidget {
                         child: const Icon(
                           Icons.arrow_back,
                           color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: Obx(
+                      () => IconButton.filled(
+                        tooltip: wishlist.contains(controller.product)
+                            ? 'Remove from wishlist'
+                            : 'Add to wishlist',
+                        onPressed: () => wishlist.toggle(controller.product),
+                        icon: Icon(
+                          wishlist.contains(controller.product)
+                              ? Icons.favorite
+                              : Icons.favorite_border,
                         ),
                       ),
                     ),

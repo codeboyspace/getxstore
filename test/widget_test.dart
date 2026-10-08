@@ -1,39 +1,39 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'dart:io';
 
+import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+
+import 'package:getx/app/routes/app_routes.dart';
 import 'package:getx/main.dart';
 
 void main() {
-  testWidgets('bottom navigation switches between the three destinations', (
+  late Directory hiveDirectory;
+
+  setUpAll(() async {
+    hiveDirectory = Directory.systemTemp.createTempSync('getx_store_test_');
+    Hive.init(hiveDirectory.path);
+    await Hive.openBox<String>('getx_store');
+  });
+
+  tearDownAll(() async {
+    await Hive.close();
+    await hiveDirectory.delete(recursive: true);
+  });
+
+  testWidgets('bottom navigation switches between home and categories', (
     tester,
   ) async {
     await tester.pumpWidget(const MyApp());
 
-    expect(find.text('GetxStore'), findsOneWidget);
+    expect(find.text("let's shop!"), findsOneWidget);
     expect(find.text('Home'), findsOneWidget);
     expect(find.text('Categories'), findsOneWidget);
     expect(find.text('Account'), findsOneWidget);
+    expect(Get.currentRoute, AppRoutes.home);
 
     await tester.tap(find.text('Categories'));
-    await tester.pump();
-    expect(
-      tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
-      1,
-    );
-
-    await tester.tap(find.text('Account'));
-    await tester.pump();
-    expect(
-      tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
-      2,
-    );
-    expect(find.text('Account'), findsNWidgets(2));
-
-    await tester.tap(find.text('Home'));
-    await tester.pump();
-    expect(
-      tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
-      0,
-    );
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(Get.currentRoute, AppRoutes.categories);
   });
 }

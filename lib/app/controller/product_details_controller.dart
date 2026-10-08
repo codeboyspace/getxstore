@@ -19,9 +19,10 @@ class ProductDetailsController extends GetxController {
     }
   }
 
-  void addToCart() {
+  Future<void> addToCart() async {
     final cartController = Get.find<CartController>();
-    cartController.addToCart(product, quantity: qty.value);
+    final saved = await cartController.addToCart(product, quantity: qty.value);
+    if (!saved) return;
 
     Get.back();
     Future<void>.delayed(const Duration(milliseconds: 350), () {

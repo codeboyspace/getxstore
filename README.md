@@ -25,7 +25,9 @@ lib/
 │   ├── controller/
 │   │   ├── product_controller.dart
 │   │   ├── product_details_controller.dart
-│   │   └── cart_controller.dart
+│   │   ├── cart_controller.dart
+│   │   ├── wishlist_controller.dart
+│   │   └── checkout_controller.dart
 │   ├── models/
 │   │   ├── product.dart
 │   │   └── cart_item.dart
@@ -33,12 +35,16 @@ lib/
 │       ├── app_pages.dart
 │       └── app_routes.dart
 │   ├── services/
-│   │   └── api_service.dart
+│   │   ├── api_service.dart
+│   │   └── local_storage_service.dart
 │   └── views/
 │       ├── pages/
 │       │   ├── home_view.dart
 │       │   ├── product_details_view.dart
-│       │   └── cart_view.dart
+│       │   ├── cart_view.dart
+│       │   ├── wishlist_view.dart
+│       │   ├── checkout_view.dart
+│       │   └── order_success_view.dart
 │       └── widgets/
 │           └── product_card.dart
 └── core/
@@ -62,6 +68,11 @@ lib/
   - `ProductController`: fetches products from DummyJSON and exposes `products`, `isLoading`, and `errorMessage`
   - `ProductDetailsController`: holds quantity and handles Add to Cart
   - `CartController`: manages cart items, item count, subtotal, delivery, and total
+  - `WishlistController`: manages and persists saved products
+  - `CheckoutController`: confirms checkout, clears the cart, and routes to success
+  - `LocalStorageService`: reusable Hive-backed string CRUD service for app data
+  - Hive stores JSON snapshots of cart items and wishlist products; the existing
+    model serializers preserve product data without generated adapters.
 - Reactive state:
   - `products = <Product>[].obs`
   - `isLoading = false.obs`
@@ -77,6 +88,23 @@ lib/
   - `/home`
   - `/product-details`
   - `/cart`
+  - `/wishlist`
+  - `/checkout`
+  - `/order-success`
+
+  ## Local Persistence and Checkout
+
+  - Hive is initialized and the `getx_store` box is opened before `runApp`.
+  - Cart and wishlist state is restored by their GetX controllers and persisted
+    after each change through `LocalStorageService`.
+  - Cart actions and pricing stay in `CartController`; the UI observes its
+    reactive state with `Obx`.
+  - Wishlist changes use `WishlistController`; product-card and details-page
+    heart buttons update reactively.
+  - Checkout shows the cart summary and asks for confirmation before deleting
+    persisted cart data. The checkout button uses `GetBuilder` for its
+    non-reactive submission state; cart and wishlist use `Obx` for Rx state.
+  - A successful order navigates to `/order-success`.
 
 ## Add-to-Cart Flow
 1. User taps a product card on the home screen.
@@ -93,9 +121,6 @@ lib/
 flutter pub get
 flutter run
 ```
-
-## Day 1 Scope Note
-Hive persistence, wishlist, and checkout are implemented on Day 2.
 
 ---
 

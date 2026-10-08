@@ -83,7 +83,7 @@ class _CategoriesViewState extends State<CategoriesView> {
           ),
           IconButton(
             tooltip: 'Wishlist',
-            onPressed: () => AppSnackbar.show('Wishlist', 'Coming soon'),
+            onPressed: () => Get.toNamed(AppRoutes.wishlist),
             icon: const Icon(Icons.favorite_border, color: Colors.black),
           ),
           const CartIconButton(),

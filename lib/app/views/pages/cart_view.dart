@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:getx/app/constants/app_constants.dart';
 import 'package:getx/app/controller/cart_controller.dart';
 import 'package:getx/app/models/cart_item.dart';
+import 'package:getx/app/routes/app_routes.dart';
 import 'package:getx/app/utils/app_snackbar.dart';
 import 'package:getx/app/views/widgets/app_network_image.dart';
 import 'package:getx/app/views/widgets/quantity_stepper.dart';
@@ -24,7 +25,7 @@ class CartView extends StatelessWidget {
         }
         return CustomScrollView(
           slivers: [
-            const SliverToBoxAdapter(),
+            const SliverToBoxAdapter(child: _DeliveryAddress()),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               sliver: SliverList.separated(
@@ -261,13 +262,10 @@ class _CartItemCard extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: _ItemAction(
+                  child:                   _ItemAction(
                     icon: Icons.favorite_border,
                     label: 'Move to Wishlist',
-                    onTap: () => AppSnackbar.show(
-                      'Wishlist',
-                      'Wishlist is not available yet.',
-                    ),
+                    onTap: () => controller.moveToWishlist(item),
                   ),
                 ),
                 Container(width: 1, height: 24, color: const Color(0xFFE0E0E0)),
@@ -479,10 +477,7 @@ class _StickyCheckoutBar extends StatelessWidget {
               child: SizedBox(
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () => AppSnackbar.show(
-                    'Checkout',
-                    'Checkout is not available yet.',
-                  ),
+                  onPressed: () => Get.toNamed(AppRoutes.checkout),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppConstants.meeshoPink,
                     foregroundColor: Colors.white,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:getx/app/constants/app_constants.dart';
+import 'package:getx/app/controller/wishlist_controller.dart';
 import 'package:getx/app/models/product.dart';
 import 'package:getx/app/routes/app_routes.dart';
 import 'package:getx/app/views/widgets/app_network_image.dart';
@@ -14,6 +15,7 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mrp = product.mrp;
+    final wishlist = Get.find<WishlistController>();
 
     return InkWell(
       onTap: () => Get.toNamed(AppRoutes.productDetails, arguments: product),
@@ -65,17 +67,34 @@ class ProductCard extends StatelessWidget {
                 Positioned(
                   top: 7,
                   right: 7,
-                  child: Icon(
-                    Icons.favorite_border,
-                    color: Colors.white,
-                    size: 23,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black.withValues(alpha: 0.55),
-                        blurRadius: 5,
+                  child: Obx(() {
+                    final isWishlisted = wishlist.contains(product);
+                    return IconButton(
+                      tooltip: isWishlisted
+                          ? 'Remove from wishlist'
+                          : 'Add to wishlist',
+                      onPressed: () => wishlist.toggle(product),
+                      icon: Icon(
+                        isWishlisted ? Icons.favorite : Icons.favorite_border,
+                        color: isWishlisted
+                            ? AppConstants.meeshoPink
+                            : Colors.white,
+                        size: 23,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.55),
+                            blurRadius: 5,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 40,
+                        minHeight: 40,
+                      ),
+                    );
+                  }),
                 ),
                 if (product.brand.isNotEmpty)
                   Positioned(
