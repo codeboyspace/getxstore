@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:getx/app/controller/cart_controller.dart';
 import 'package:getx/app/models/product.dart';
+import 'package:getx/app/utils/app_snackbar.dart';
 
 class ProductDetailsController extends GetxController {
   final Product product;
@@ -23,15 +23,9 @@ class ProductDetailsController extends GetxController {
     final cartController = Get.find<CartController>();
     cartController.addToCart(product, quantity: qty.value);
 
-    Get.snackbar(
-      'Added to Cart',
-      product.title,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-      duration: const Duration(seconds: 1),
-    );
-
     Get.back();
+    Future<void>.delayed(const Duration(milliseconds: 350), () {
+      AppSnackbar.show('Added to Cart', product.title);
+    });
   }
 }

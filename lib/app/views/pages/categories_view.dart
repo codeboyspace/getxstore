@@ -7,6 +7,7 @@ import 'package:getx/app/controller/cart_controller.dart';
 import 'package:getx/app/controller/product_controller.dart';
 import 'package:getx/app/models/product.dart';
 import 'package:getx/app/routes/app_routes.dart';
+import 'package:getx/app/utils/app_snackbar.dart';
 import 'package:getx/app/views/widgets/bottom_nav.dart';
 
 class CategoriesView extends StatefulWidget {
@@ -78,12 +79,12 @@ class _CategoriesViewState extends State<CategoriesView> {
           IconButton(
             tooltip: 'Search',
             onPressed: () =>
-                Get.snackbar('Search', 'Search will be available soon'),
+                AppSnackbar.show('Search', 'Search will be available soon'),
             icon: const Icon(Icons.search, color: Colors.black),
           ),
           IconButton(
             tooltip: 'Wishlist',
-            onPressed: () => Get.snackbar('Wishlist', 'Coming soon'),
+            onPressed: () => AppSnackbar.show('Wishlist', 'Coming soon'),
             icon: const Icon(Icons.favorite_border, color: Colors.black),
           ),
           Obx(

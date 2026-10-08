@@ -11,6 +11,7 @@ import 'package:getx/app/controller/cart_controller.dart';
 import 'package:getx/app/controller/product_controller.dart';
 import 'package:getx/app/models/product.dart';
 import 'package:getx/app/routes/app_routes.dart';
+import 'package:getx/app/utils/app_snackbar.dart';
 import 'package:getx/app/views/widgets/bottom_nav.dart';
 import 'package:getx/app/views/widgets/product_card.dart';
 
@@ -94,7 +95,7 @@ class _StoreHeader extends StatelessWidget {
           ),
           IconButton(
             tooltip: 'Wishlist',
-            onPressed: () => Get.snackbar('Wishlist', 'Coming soon'),
+            onPressed: () => AppSnackbar.show('Wishlist', 'Coming soon'),
             icon: const Icon(Icons.favorite_border, size: 24),
           ),
           Obx(
@@ -150,7 +151,8 @@ class _SearchBar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       child: TextField(
         readOnly: true,
-        onTap: () => Get.snackbar('Search', 'Search will be available soon'),
+        onTap: () =>
+            AppSnackbar.show('Search', 'Search will be available soon'),
         decoration: InputDecoration(
           filled: true,
           fillColor: AppConstants.scaffoldGrey,
@@ -647,34 +649,21 @@ class _FilterBar extends StatelessWidget {
         children: [
           _FilterAction(
             label: '↕  Sort',
-            onTap: () => Get.snackbar(
-              'Sort',
-              'Sorting options coming soon',
-              colorText: Colors.white,
-              backgroundColor: AppConstants.meeshoPink,
-            ),
+            onTap: () =>
+                AppSnackbar.show('Sort', 'Sorting options coming soon'),
           ),
           const _FilterDivider(),
           _FilterAction(label: 'Category ⌄', onTap: onCategoryTap),
           const _FilterDivider(),
           _FilterAction(
             label: 'Gender ⌄',
-            onTap: () => Get.snackbar(
-              'Gender',
-              'Gender filters coming soon',
-              colorText: Colors.white,
-              backgroundColor: AppConstants.meeshoPink,
-            ),
+            onTap: () =>
+                AppSnackbar.show('Gender', 'Gender filters coming soon'),
           ),
           const _FilterDivider(),
           _FilterAction(
             label: '≡  Filters',
-            onTap: () => Get.snackbar(
-              'Filters',
-              'Filters coming soon',
-              colorText: Colors.white,
-              backgroundColor: AppConstants.meeshoPink,
-            ),
+            onTap: () => AppSnackbar.show('Filters', 'Filters coming soon'),
           ),
         ],
       ),

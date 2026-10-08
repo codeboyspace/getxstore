@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:getx/app/constants/app_constants.dart';
 import 'package:getx/app/routes/app_routes.dart';
+import 'package:getx/app/utils/app_snackbar.dart';
 
 class BottomNav extends StatelessWidget {
   final int currentIndex;
@@ -34,12 +35,7 @@ class BottomNav extends StatelessWidget {
       return;
     }
 
-    Get.snackbar(
-      _items[index].$2,
-      'Coming soon',
-      snackPosition: SnackPosition.BOTTOM,
-      margin: const EdgeInsets.all(12),
-    );
+    AppSnackbar.show(_items[index].$2, 'Coming soon');
   }
 
   @override

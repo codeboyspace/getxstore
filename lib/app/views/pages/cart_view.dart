@@ -145,7 +145,12 @@ class CartView extends StatelessWidget {
             ),
             Container(
               color: Colors.white,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.only(
+                bottom: 55,
+                left: 20,
+                right: 20,
+                top: 10,
+              ),
               child: Column(
                 children: [
                   Row(
