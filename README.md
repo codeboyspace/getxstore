@@ -1,6 +1,6 @@
 # GetxStore
 
-A Flutter + GetX mini e-commerce app for Day 1 of the internship assessment. It loads products from DummyJSON, shows a Meesho-inspired product grid, supports product details, and manages cart state with reactive GetX updates.
+A Flutter + GetX mini e-commerce app. It loads and searches products from DummyJSON, shows a Meesho-inspired product grid, supports product details, and manages cart state with reactive GetX updates.
 
 ## Tech Stack
 - Flutter
@@ -91,6 +91,11 @@ lib/
   - `/wishlist`
   - `/checkout`
   - `/order-success`
+- Product discovery:
+  - Home search calls DummyJSON `/products/search?q=...` after typing pauses.
+  - Sort supports relevance, price ascending/descending, and highest rating.
+  - Product category navigation remains available; gender and generic filter
+    controls are not shown on the home screen.
 
   ## Local Persistence and Checkout
 

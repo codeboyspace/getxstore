@@ -9,7 +9,6 @@ import 'package:getx/app/constants/app_constants.dart';
 import 'package:getx/app/controller/product_controller.dart';
 import 'package:getx/app/models/product.dart';
 import 'package:getx/app/routes/app_routes.dart';
-import 'package:getx/app/utils/app_snackbar.dart';
 import 'package:getx/app/views/widgets/bottom_nav.dart';
 import 'package:getx/app/views/widgets/app_network_image.dart';
 import 'package:getx/app/views/widgets/cart_icon_button.dart';
@@ -30,7 +29,7 @@ class HomeView extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             const SliverToBoxAdapter(child: _StoreHeader()),
-            const SliverToBoxAdapter(child: _SearchBar()),
+            SliverToBoxAdapter(child: _SearchBar(controller: products)),
             const SliverToBoxAdapter(child: _FirstOrderBanner()),
             const SliverToBoxAdapter(child: _TrustBadges()),
             SliverToBoxAdapter(child: _FeaturedSection(controller: products)),
@@ -44,6 +43,7 @@ class HomeView extends StatelessWidget {
               pinned: true,
               delegate: _FilterBarDelegate(
                 child: _FilterBar(
+                  controller: products,
                   onCategoryTap: () {
                     Get.toNamed(AppRoutes.categories);
                   },
@@ -103,7 +103,9 @@ class _StoreHeader extends StatelessWidget {
 }
 
 class _SearchBar extends StatelessWidget {
-  const _SearchBar();
+  final ProductController controller;
+
+  const _SearchBar({required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -111,9 +113,7 @@ class _SearchBar extends StatelessWidget {
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       child: TextField(
-        readOnly: true,
-        onTap: () =>
-            AppSnackbar.show('Search', 'Search will be available soon'),
+        onChanged: controller.updateSearchQuery,
         decoration: InputDecoration(
           filled: true,
           fillColor: AppConstants.scaffoldGrey,
@@ -123,14 +123,14 @@ class _SearchBar extends StatelessWidget {
             fontSize: 13,
           ),
           prefixIcon: const Icon(Icons.search, color: AppConstants.textGrey),
-          suffixIcon: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.mic_none, color: AppConstants.textGrey),
-              SizedBox(width: 12),
-              Icon(Icons.camera_alt_outlined, color: AppConstants.textGrey),
-              SizedBox(width: 12),
-            ],
+          suffixIcon: Obx(
+            () => controller.searchQuery.isEmpty
+                ? const Icon(Icons.search, color: AppConstants.textGrey)
+                : IconButton(
+                    tooltip: 'Clear search',
+                    onPressed: () => controller.updateSearchQuery(''),
+                    icon: const Icon(Icons.close),
+                  ),
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
@@ -590,9 +590,55 @@ class _BlockbusterBanner extends StatelessWidget {
 }
 
 class _FilterBar extends StatelessWidget {
+  final ProductController controller;
   final VoidCallback onCategoryTap;
 
-  const _FilterBar({required this.onCategoryTap});
+  const _FilterBar({required this.controller, required this.onCategoryTap});
+
+  void _showSortOptions() {
+    Get.bottomSheet<void>(
+      SafeArea(
+        child: Material(
+          color: Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Sort products by',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 8),
+                ...ProductSortOption.values.map((option) {
+                  final selected = controller.sortOption.value == option;
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(option.label),
+                    leading: Icon(
+                      selected
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_unchecked,
+                      color: selected
+                          ? AppConstants.meeshoPink
+                          : AppConstants.textGrey,
+                    ),
+                    onTap: () {
+                      controller.setSortOption(option);
+                      Get.back();
+                    },
+                  );
+                }),
+              ],
+            ),
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -600,24 +646,9 @@ class _FilterBar extends StatelessWidget {
       color: Colors.white,
       child: Row(
         children: [
-          _FilterAction(
-            label: '↕  Sort',
-            onTap: () =>
-                AppSnackbar.show('Sort', 'Sorting options coming soon'),
-          ),
+          _FilterAction(label: '↕  Sort', onTap: _showSortOptions),
           const _FilterDivider(),
           _FilterAction(label: 'Category ⌄', onTap: onCategoryTap),
-          const _FilterDivider(),
-          _FilterAction(
-            label: 'Gender ⌄',
-            onTap: () =>
-                AppSnackbar.show('Gender', 'Gender filters coming soon'),
-          ),
-          const _FilterDivider(),
-          _FilterAction(
-            label: '≡  Filters',
-            onTap: () => AppSnackbar.show('Filters', 'Filters coming soon'),
-          ),
         ],
       ),
     );
@@ -734,17 +765,18 @@ class _ProductGridSliver extends StatelessWidget {
         );
       }
 
-      if (controller.products.isEmpty) {
+      final visibleProducts = controller.visibleProducts;
+      if (visibleProducts.isEmpty) {
         return const SliverFillRemaining(
           hasScrollBody: false,
-          child: Center(child: Text('No products found')),
+          child: Center(child: Text('No matching products found')),
         );
       }
 
       return SliverPadding(
         padding: const EdgeInsets.all(8),
         sliver: SliverGrid.builder(
-          itemCount: controller.products.length,
+          itemCount: visibleProducts.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             childAspectRatio: 0.55,
@@ -752,7 +784,7 @@ class _ProductGridSliver extends StatelessWidget {
             crossAxisSpacing: 8,
           ),
           itemBuilder: (context, index) =>
-              ProductCard(product: controller.products[index]),
+              ProductCard(product: visibleProducts[index]),
         ),
       );
     });

@@ -1,7 +1,20 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 
 import 'package:getx/app/models/product.dart';
 import 'package:getx/app/services/api_service.dart';
+
+enum ProductSortOption {
+  relevance('Relevance'),
+  priceLowToHigh('Price: Low to High'),
+  priceHighToLow('Price: High to Low'),
+  rating('Top Rated');
+
+  const ProductSortOption(this.label);
+
+  final String label;
+}
 
 class ProductController extends GetxController {
   final ApiService _apiService = Get.find<ApiService>();
@@ -11,6 +24,10 @@ class ProductController extends GetxController {
   final errorMessage = ''.obs;
   final selectedTab = 0.obs;
   final selectedCategory = ''.obs;
+  final searchQuery = ''.obs;
+  final sortOption = ProductSortOption.relevance.obs;
+  Timer? _searchDebounce;
+  int _requestId = 0;
 
   List<String> get categories =>
       products
@@ -21,13 +38,23 @@ class ProductController extends GetxController {
         ..sort();
 
   List<Product> get visibleProducts {
-    if (selectedTab.value != 1 || selectedCategory.value.isEmpty) {
-      return products;
+    var result = products.toList();
+    if (selectedTab.value == 1 && selectedCategory.value.isNotEmpty) {
+      result = result
+          .where((product) => product.category == selectedCategory.value)
+          .toList();
     }
-
-    return products
-        .where((product) => product.category == selectedCategory.value)
-        .toList();
+    switch (sortOption.value) {
+      case ProductSortOption.relevance:
+        break;
+      case ProductSortOption.priceLowToHigh:
+        result.sort((a, b) => a.price.compareTo(b.price));
+      case ProductSortOption.priceHighToLow:
+        result.sort((a, b) => b.price.compareTo(a.price));
+      case ProductSortOption.rating:
+        result.sort((a, b) => b.rating.compareTo(a.rating));
+    }
+    return result;
   }
 
   void selectTab(int index) {
@@ -39,6 +66,19 @@ class ProductController extends GetxController {
     selectedCategory.value = selectedCategory.value == category ? '' : category;
   }
 
+  void setSortOption(ProductSortOption option) {
+    sortOption.value = option;
+  }
+
+  void updateSearchQuery(String query) {
+    searchQuery.value = query.trim();
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(
+      const Duration(milliseconds: 350),
+      () => fetchProducts(),
+    );
+  }
+
   @override
   void onInit() {
     fetchProducts();
@@ -46,17 +86,30 @@ class ProductController extends GetxController {
   }
 
   Future<void> fetchProducts() async {
+    _searchDebounce?.cancel();
+    final requestId = ++_requestId;
     try {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final result = await _apiService.fetchProducts();
+      final query = searchQuery.value;
+      final result = query.isEmpty
+          ? await _apiService.fetchProducts()
+          : await _apiService.searchProducts(query);
+      if (requestId != _requestId) return;
       products.assignAll(result);
     } catch (e) {
+      if (requestId != _requestId) return;
       errorMessage.value = e.toString();
       products.clear();
     } finally {
-      isLoading.value = false;
+      if (requestId == _requestId) isLoading.value = false;
     }
+  }
+
+  @override
+  void onClose() {
+    _searchDebounce?.cancel();
+    super.onClose();
   }
 }

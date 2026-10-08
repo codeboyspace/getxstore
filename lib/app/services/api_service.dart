@@ -7,11 +7,24 @@ import 'package:getx/app/models/product.dart';
 
 class ApiService {
   Future<List<Product>> fetchProducts() async {
-    final uri = Uri.parse('${AppConstants.productsUrl}?limit=20&skip=0');
+    final uri = Uri.parse(
+      AppConstants.productsUrl,
+    ).replace(queryParameters: {'limit': '20', 'skip': '0'});
+    return _fetchProductList(uri);
+  }
+
+  Future<List<Product>> searchProducts(String query) async {
+    final uri = Uri.parse(
+      AppConstants.productsSearchUrl,
+    ).replace(queryParameters: {'q': query});
+    return _fetchProductList(uri);
+  }
+
+  Future<List<Product>> _fetchProductList(Uri uri) async {
     final response = await http.get(uri);
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to load products');
+      throw Exception('Failed to load products (${response.statusCode})');
     }
 
     final decoded = jsonDecode(response.body);
