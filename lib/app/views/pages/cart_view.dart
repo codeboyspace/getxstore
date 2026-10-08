@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -6,6 +5,8 @@ import 'package:getx/app/constants/app_constants.dart';
 import 'package:getx/app/controller/cart_controller.dart';
 import 'package:getx/app/models/cart_item.dart';
 import 'package:getx/app/utils/app_snackbar.dart';
+import 'package:getx/app/views/widgets/app_network_image.dart';
+import 'package:getx/app/views/widgets/quantity_stepper.dart';
 
 class CartView extends StatelessWidget {
   const CartView({super.key});
@@ -59,21 +60,13 @@ class _CartHeader extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         children: [
-          SizedBox(
-            width: 76,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                tooltip: 'Back',
-                onPressed: Get.back,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 40, minHeight: 20),
-                icon: const Icon(Icons.arrow_back_ios, size: 20),
-              ),
-            ),
+          IconButton(
+            tooltip: 'Back',
+            onPressed: Get.back,
+            icon: const Icon(Icons.arrow_back_ios, size: 20),
           ),
           const Expanded(
             child: Center(
@@ -83,7 +76,7 @@ class _CartHeader extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
           ),
-          const SizedBox(width: 76),
+          Container(width: 50),
         ],
       ),
     );
@@ -148,10 +141,6 @@ class _CartItemCard extends StatelessWidget {
     final product = item.product;
     final originalPrice = product.mrp * item.quantity;
     final currentPrice = product.price * item.quantity;
-    final quantityOptions = List<int>.generate(
-      item.quantity < 10 ? 10 : item.quantity,
-      (index) => index + 1,
-    );
 
     return Container(
       decoration: BoxDecoration(
@@ -167,17 +156,11 @@ class _CartItemCard extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
-                  child: CachedNetworkImage(
+                  child: AppNetworkImage(
                     imageUrl: product.thumbnail,
                     width: 80,
                     height: 100,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) =>
-                        Container(color: Colors.grey.shade200),
-                    errorWidget: (context, url, error) => Container(
-                      color: Colors.grey.shade200,
-                      child: const Icon(Icons.image_not_supported_outlined),
-                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -229,19 +212,19 @@ class _CartItemCard extends StatelessWidget {
                         spacing: 7,
                         runSpacing: 6,
                         children: [
-                          //const _AttributeChip(label: 'Size: Un Stitched'),
-                          _QuantityChip(
-                            quantity: item.quantity,
-                            options: quantityOptions,
-                            onChanged: (quantity) {
-                              if (quantity == null) return;
-                              while (item.quantity < quantity) {
-                                controller.increaseItem(item);
-                              }
-                              while (item.quantity > quantity) {
-                                controller.decreaseItem(item);
-                              }
-                            },
+                          QuantityStepper(
+                            value: item.quantity,
+                            onDecrease: () => controller.decreaseItem(item),
+                            onIncrease: () => controller.increaseItem(item),
+                            height: 32,
+                            buttonSize: 30,
+                            iconSize: 15,
+                            valueWidth: 30,
+                            borderRadius: 5,
+                            valueStyle: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
@@ -299,72 +282,6 @@ class _CartItemCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _AttributeChip extends StatelessWidget {
-  final String label;
-
-  const _AttributeChip({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFD8D8D8)),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 10)),
-          const SizedBox(width: 3),
-          const Icon(Icons.keyboard_arrow_down, size: 14),
-        ],
-      ),
-    );
-  }
-}
-
-class _QuantityChip extends StatelessWidget {
-  final int quantity;
-  final List<int> options;
-  final ValueChanged<int?> onChanged;
-
-  const _QuantityChip({
-    required this.quantity,
-    required this.options,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 29,
-      padding: const EdgeInsets.only(left: 7, right: 3),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFD8D8D8)),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<int>(
-          value: quantity,
-          isDense: true,
-          icon: const Icon(Icons.keyboard_arrow_down, size: 14),
-          style: const TextStyle(color: Colors.black, fontSize: 10),
-          items: options
-              .map(
-                (value) => DropdownMenuItem<int>(
-                  value: value,
-                  child: Text('Qty: $value'),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
       ),
     );
   }

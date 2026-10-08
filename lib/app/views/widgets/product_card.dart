@@ -1,10 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:getx/app/constants/app_constants.dart';
 import 'package:getx/app/models/product.dart';
 import 'package:getx/app/routes/app_routes.dart';
+import 'package:getx/app/views/widgets/app_network_image.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -33,15 +33,9 @@ class ProductCard extends StatelessWidget {
                   ),
                   child: AspectRatio(
                     aspectRatio: 1,
-                    child: CachedNetworkImage(
+                    child: AppNetworkImage(
                       imageUrl: product.thumbnail,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) =>
-                          Container(color: Colors.grey.shade200),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey.shade200,
-                        child: const Icon(Icons.image_not_supported_outlined),
-                      ),
                     ),
                   ),
                 ),

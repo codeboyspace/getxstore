@@ -2,17 +2,17 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:zo_animated_border/zo_animated_border.dart';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:getx/app/constants/app_constants.dart';
-import 'package:getx/app/controller/cart_controller.dart';
 import 'package:getx/app/controller/product_controller.dart';
 import 'package:getx/app/models/product.dart';
 import 'package:getx/app/routes/app_routes.dart';
 import 'package:getx/app/utils/app_snackbar.dart';
 import 'package:getx/app/views/widgets/bottom_nav.dart';
+import 'package:getx/app/views/widgets/app_network_image.dart';
+import 'package:getx/app/views/widgets/cart_icon_button.dart';
 import 'package:getx/app/views/widgets/product_card.dart';
 
 class HomeView extends StatelessWidget {
@@ -21,7 +21,6 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final products = Get.find<ProductController>();
-    final cart = Get.find<CartController>();
 
     return Scaffold(
       backgroundColor: AppConstants.scaffoldGrey,
@@ -30,7 +29,7 @@ class HomeView extends StatelessWidget {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(child: _StoreHeader(cart: cart)),
+            const SliverToBoxAdapter(child: _StoreHeader()),
             const SliverToBoxAdapter(child: _SearchBar()),
             const SliverToBoxAdapter(child: _FirstOrderBanner()),
             const SliverToBoxAdapter(child: _TrustBadges()),
@@ -61,9 +60,7 @@ class HomeView extends StatelessWidget {
 }
 
 class _StoreHeader extends StatelessWidget {
-  final CartController cart;
-
-  const _StoreHeader({required this.cart});
+  const _StoreHeader();
 
   @override
   Widget build(BuildContext context) {
@@ -98,43 +95,7 @@ class _StoreHeader extends StatelessWidget {
             onPressed: () => AppSnackbar.show('Wishlist', 'Coming soon'),
             icon: const Icon(Icons.favorite_border, size: 24),
           ),
-          Obx(
-            () => Stack(
-              clipBehavior: Clip.none,
-              children: [
-                IconButton(
-                  tooltip: 'Cart',
-                  onPressed: () => Get.toNamed(AppRoutes.cart),
-                  icon: const Icon(Icons.shopping_cart_outlined, size: 24),
-                ),
-                if (cart.itemCount > 0)
-                  Positioned(
-                    top: 2,
-                    right: 1,
-                    child: Container(
-                      constraints: const BoxConstraints(
-                        minWidth: 17,
-                        minHeight: 17,
-                      ),
-                      padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                        color: AppConstants.meeshoPink,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        '${cart.itemCount}',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          height: 1,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
+          const CartIconButton(),
         ],
       ),
     );
@@ -403,13 +364,9 @@ class _FeaturedRow extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    CachedNetworkImage(
+                    AppNetworkImage(
                       imageUrl: product.thumbnail,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) =>
-                          Container(color: Colors.grey.shade300),
-                      errorWidget: (context, url, error) =>
-                          Container(color: Colors.grey.shade300),
                     ),
                     Positioned(
                       left: 5,
@@ -517,15 +474,11 @@ class _BestPriceCarouselState extends State<_BestPriceCarousel> {
                     padding: const EdgeInsets.only(right: 6),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(6),
-                      child: CachedNetworkImage(
+                      child: AppNetworkImage(
                         imageUrl: product.thumbnail,
                         width: 52,
                         height: 60,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            Container(color: Colors.grey.shade300),
-                        errorWidget: (context, url, error) =>
-                            Container(color: Colors.grey.shade300),
                       ),
                     ),
                   ),

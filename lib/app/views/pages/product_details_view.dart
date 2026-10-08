@@ -1,8 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:getx/app/controller/product_details_controller.dart';
+import 'package:getx/app/views/widgets/app_network_image.dart';
+import 'package:getx/app/views/widgets/quantity_stepper.dart';
 
 class ProductDetailsView extends StatelessWidget {
   const ProductDetailsView({super.key});
@@ -31,15 +32,9 @@ class ProductDetailsView extends StatelessWidget {
                             ? controller.product.images[index]
                             : controller.product.thumbnail;
 
-                        return CachedNetworkImage(
+                        return AppNetworkImage(
                           imageUrl: imageUrl,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) =>
-                              Container(color: Colors.grey.shade200),
-                          errorWidget: (context, url, error) => Container(
-                            color: Colors.grey.shade200,
-                            child: const Icon(Icons.image_not_supported),
-                          ),
                         );
                       },
                     ),
@@ -219,31 +214,20 @@ class ProductDetailsView extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              IconButton(
-                                onPressed: controller.decrement,
-                                icon: const Icon(Icons.remove),
-                              ),
-                              Obx(
-                                () => Text(
-                                  '${controller.qty.value}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: controller.increment,
-                                icon: const Icon(Icons.add),
-                              ),
-                            ],
+                        Obx(
+                          () => QuantityStepper(
+                            value: controller.qty.value,
+                            onDecrease: controller.decrement,
+                            onIncrease: controller.increment,
+                            height: 44,
+                            buttonSize: 40,
+                            iconSize: 18,
+                            valueWidth: 34,
+                            borderRadius: 12,
+                            valueStyle: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                            ),
                           ),
                         ),
                       ],

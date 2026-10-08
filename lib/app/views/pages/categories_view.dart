@@ -1,14 +1,14 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:getx/app/constants/app_constants.dart';
-import 'package:getx/app/controller/cart_controller.dart';
 import 'package:getx/app/controller/product_controller.dart';
 import 'package:getx/app/models/product.dart';
 import 'package:getx/app/routes/app_routes.dart';
 import 'package:getx/app/utils/app_snackbar.dart';
 import 'package:getx/app/views/widgets/bottom_nav.dart';
+import 'package:getx/app/views/widgets/app_network_image.dart';
+import 'package:getx/app/views/widgets/cart_icon_button.dart';
 
 class CategoriesView extends StatefulWidget {
   const CategoriesView({super.key});
@@ -59,7 +59,6 @@ class _CategoriesViewState extends State<CategoriesView> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ProductController>();
-    final cart = Get.find<CartController>();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -87,46 +86,7 @@ class _CategoriesViewState extends State<CategoriesView> {
             onPressed: () => AppSnackbar.show('Wishlist', 'Coming soon'),
             icon: const Icon(Icons.favorite_border, color: Colors.black),
           ),
-          Obx(
-            () => Stack(
-              clipBehavior: Clip.none,
-              children: [
-                IconButton(
-                  tooltip: 'Cart',
-                  onPressed: () => Get.toNamed(AppRoutes.cart),
-                  icon: const Icon(
-                    Icons.shopping_cart_outlined,
-                    color: Colors.black,
-                  ),
-                ),
-                if (cart.itemCount > 0)
-                  Positioned(
-                    right: 5,
-                    top: 4,
-                    child: Container(
-                      constraints: const BoxConstraints(
-                        minWidth: 17,
-                        minHeight: 17,
-                      ),
-                      padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                        color: AppConstants.meeshoPink,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        '${cart.itemCount}',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          height: 1,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
+          const CartIconButton(),
         ],
       ),
       body: Row(
@@ -303,13 +263,9 @@ class _CategorySidebarTile extends StatelessWidget {
                             color: Colors.white,
                           ),
                         )
-                      : CachedNetworkImage(
+                      : AppNetworkImage(
                           imageUrl: product.thumbnail,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) =>
-                              Container(color: Colors.grey.shade300),
-                          errorWidget: (context, url, error) =>
-                              Container(color: Colors.grey.shade300),
                         ),
                 ),
               ),
@@ -348,15 +304,9 @@ class _CategoryProductTile extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: SizedBox.expand(
-                child: CachedNetworkImage(
+                child: AppNetworkImage(
                   imageUrl: product.thumbnail,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      Container(color: Colors.grey.shade200),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey.shade200,
-                    child: const Icon(Icons.image_not_supported_outlined),
-                  ),
                 ),
               ),
             ),
