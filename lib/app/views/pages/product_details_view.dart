@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:getx/app/controller/wishlist_controller.dart';
 import 'package:getx/app/controller/product_details_controller.dart';
+import 'package:getx/app/utils/price_formatter.dart';
 import 'package:getx/app/views/widgets/app_network_image.dart';
 import 'package:getx/app/views/widgets/quantity_stepper.dart';
 
@@ -132,25 +133,26 @@ class ProductDetailsView extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    Row(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 6,
                       children: [
                         Text(
-                          '₹${controller.product.price.toStringAsFixed(0)}',
+                          PriceFormatter.format(controller.product.price),
                           style: const TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(width: 8),
                         Text(
-                          '₹${controller.product.mrp.toStringAsFixed(0)}',
+                          PriceFormatter.format(controller.product.mrp),
                           style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 18,
                             decoration: TextDecoration.lineThrough,
                           ),
                         ),
-                        const SizedBox(width: 8),
                         Text(
                           '${controller.product.discountPercentage.toStringAsFixed(0)}% off',
                           style: const TextStyle(
@@ -238,6 +240,8 @@ class ProductDetailsView extends StatelessWidget {
                             value: controller.qty.value,
                             onDecrease: controller.decrement,
                             onIncrease: controller.increment,
+                            isDecreaseEnabled: controller.qty.value > 1,
+                            isIncreaseEnabled: controller.canIncrease,
                             height: 44,
                             buttonSize: 40,
                             iconSize: 18,

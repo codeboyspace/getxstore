@@ -5,6 +5,7 @@ import 'package:getx/app/constants/app_constants.dart';
 import 'package:getx/app/controller/wishlist_controller.dart';
 import 'package:getx/app/models/product.dart';
 import 'package:getx/app/routes/app_routes.dart';
+import 'package:getx/app/utils/price_formatter.dart';
 import 'package:getx/app/views/widgets/app_network_image.dart';
 
 class ProductCard extends StatelessWidget {
@@ -96,36 +97,6 @@ class ProductCard extends StatelessWidget {
                     );
                   }),
                 ),
-                if (product.brand.isNotEmpty)
-                  Positioned(
-                    left: 7,
-                    bottom: 7,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 7,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppConstants.mallBadgeBlue,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.verified, color: Colors.white, size: 11),
-                          SizedBox(width: 3),
-                          Text(
-                            'Mall',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
               ],
             ),
             Padding(
@@ -144,23 +115,23 @@ class ProductCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 5),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      PriceFormatter.format(product.price),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
                   Row(
                     children: [
                       Flexible(
                         child: Text(
-                          '₹${product.price.toStringAsFixed(0)}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          '₹${mrp.toStringAsFixed(0)}',
+                          PriceFormatter.format(mrp),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -171,7 +142,7 @@ class ProductCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      Expanded(
+                      Flexible(
                         child: Text(
                           '${product.discountPercentage.toStringAsFixed(0)}% off',
                           maxLines: 1,
@@ -220,7 +191,7 @@ class ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '₹${(product.price - 20).clamp(0, double.infinity).toStringAsFixed(0)} with 1 Special Offer',
+                    '${PriceFormatter.format((product.price - 20).clamp(0, double.infinity))} with 1 Special Offer',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

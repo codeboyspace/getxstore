@@ -4,6 +4,8 @@ class QuantityStepper extends StatelessWidget {
   final int value;
   final VoidCallback onDecrease;
   final VoidCallback onIncrease;
+  final bool isDecreaseEnabled;
+  final bool isIncreaseEnabled;
   final double height;
   final double buttonSize;
   final double iconSize;
@@ -16,6 +18,8 @@ class QuantityStepper extends StatelessWidget {
     required this.value,
     required this.onDecrease,
     required this.onIncrease,
+    this.isDecreaseEnabled = true,
+    this.isIncreaseEnabled = true,
     this.height = 40,
     this.buttonSize = 38,
     this.iconSize = 18,
@@ -40,7 +44,8 @@ class QuantityStepper extends StatelessWidget {
             semanticLabel: 'Decrease quantity',
             size: buttonSize,
             iconSize: iconSize,
-            onPressed: onDecrease,
+            onPressed: isDecreaseEnabled ? onDecrease : null,
+            enabled: isDecreaseEnabled,
           ),
           SizedBox(
             width: valueWidth,
@@ -57,7 +62,8 @@ class QuantityStepper extends StatelessWidget {
             semanticLabel: 'Increase quantity',
             size: buttonSize,
             iconSize: iconSize,
-            onPressed: onIncrease,
+            onPressed: isIncreaseEnabled ? onIncrease : null,
+            enabled: isIncreaseEnabled,
           ),
         ],
       ),
@@ -70,7 +76,8 @@ class _QuantityButton extends StatelessWidget {
   final String semanticLabel;
   final double size;
   final double iconSize;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final bool enabled;
 
   const _QuantityButton({
     required this.icon,
@@ -78,6 +85,7 @@ class _QuantityButton extends StatelessWidget {
     required this.size,
     required this.iconSize,
     required this.onPressed,
+    required this.enabled,
   });
 
   @override
@@ -90,7 +98,11 @@ class _QuantityButton extends StatelessWidget {
         onPressed: onPressed,
         padding: EdgeInsets.zero,
         visualDensity: VisualDensity.compact,
-        icon: Icon(icon, size: iconSize),
+        icon: Icon(
+          icon,
+          size: iconSize,
+          color: enabled ? Colors.black87 : Colors.grey.shade400,
+        ),
       ),
     );
   }

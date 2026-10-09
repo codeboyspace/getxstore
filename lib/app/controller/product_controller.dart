@@ -1,9 +1,7 @@
-import 'dart:async';
-
 import 'package:get/get.dart';
 
-import 'package:getx/app/models/product.dart';
 import 'package:getx/app/services/api_service.dart';
+import 'package:getx/app/models/product.dart';
 
 enum ProductSortOption {
   relevance('Relevance'),
@@ -17,16 +15,17 @@ enum ProductSortOption {
 }
 
 class ProductController extends GetxController {
-  final ApiService _apiService = Get.find<ApiService>();
+  final ApiService _apiService;
+
+  ProductController({required ApiService apiService})
+    : _apiService = apiService;
 
   final products = <Product>[].obs;
   final isLoading = false.obs;
   final errorMessage = ''.obs;
   final selectedTab = 0.obs;
   final selectedCategory = ''.obs;
-  final searchQuery = ''.obs;
   final sortOption = ProductSortOption.relevance.obs;
-  Timer? _searchDebounce;
   int _requestId = 0;
 
   List<String> get categories =>
@@ -70,15 +69,6 @@ class ProductController extends GetxController {
     sortOption.value = option;
   }
 
-  void updateSearchQuery(String query) {
-    searchQuery.value = query.trim();
-    _searchDebounce?.cancel();
-    _searchDebounce = Timer(
-      const Duration(milliseconds: 350),
-      () => fetchProducts(),
-    );
-  }
-
   @override
   void onInit() {
     fetchProducts();
@@ -86,16 +76,12 @@ class ProductController extends GetxController {
   }
 
   Future<void> fetchProducts() async {
-    _searchDebounce?.cancel();
     final requestId = ++_requestId;
     try {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final query = searchQuery.value;
-      final result = query.isEmpty
-          ? await _apiService.fetchProducts()
-          : await _apiService.searchProducts(query);
+      final result = await _apiService.fetchProducts();
       if (requestId != _requestId) return;
       products.assignAll(result);
     } catch (e) {
@@ -107,9 +93,4 @@ class ProductController extends GetxController {
     }
   }
 
-  @override
-  void onClose() {
-    _searchDebounce?.cancel();
-    super.onClose();
-  }
 }

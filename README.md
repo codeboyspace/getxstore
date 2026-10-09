@@ -96,6 +96,8 @@ lib/
   - Sort supports relevance, price ascending/descending, and highest rating.
   - Product category navigation remains available; gender and generic filter
     controls are not shown on the home screen.
+- Prices use Indian digit grouping (for example, `₹1,00,000`) throughout the
+  product, cart, wishlist, and checkout screens.
 
   ## Local Persistence and Checkout
 

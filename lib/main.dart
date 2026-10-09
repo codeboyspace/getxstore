@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'app/di/service_locator.dart';
 import 'app/bindings/initial_binding.dart';
 import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';
@@ -9,7 +10,8 @@ import 'app/routes/app_routes.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  await Hive.openBox<String>('getx_store');
+  final storageBox = await Hive.openBox<String>('getx_store');
+  configureDependencies(storageBox);
   runApp(const MyApp());
 }
 

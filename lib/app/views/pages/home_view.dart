@@ -9,6 +9,7 @@ import 'package:getx/app/constants/app_constants.dart';
 import 'package:getx/app/controller/product_controller.dart';
 import 'package:getx/app/models/product.dart';
 import 'package:getx/app/routes/app_routes.dart';
+import 'package:getx/app/utils/price_formatter.dart';
 import 'package:getx/app/views/widgets/bottom_nav.dart';
 import 'package:getx/app/views/widgets/app_network_image.dart';
 import 'package:getx/app/views/widgets/cart_icon_button.dart';
@@ -29,7 +30,7 @@ class HomeView extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             const SliverToBoxAdapter(child: _StoreHeader()),
-            SliverToBoxAdapter(child: _SearchBar(controller: products)),
+            const SliverToBoxAdapter(child: _SearchBar()),
             const SliverToBoxAdapter(child: _FirstOrderBanner()),
             const SliverToBoxAdapter(child: _TrustBadges()),
             SliverToBoxAdapter(child: _FeaturedSection(controller: products)),
@@ -103,44 +104,41 @@ class _StoreHeader extends StatelessWidget {
 }
 
 class _SearchBar extends StatelessWidget {
-  final ProductController controller;
-
-  const _SearchBar({required this.controller});
+  const _SearchBar();
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-      child: TextField(
-        onChanged: controller.updateSearchQuery,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: AppConstants.scaffoldGrey,
-          hintText: 'Search by Keyword or Product ID',
-          hintStyle: const TextStyle(
-            color: AppConstants.textGrey,
-            fontSize: 13,
+      child: GestureDetector(
+        onTap: () => Get.toNamed(AppRoutes.search),
+        child: AbsorbPointer(
+          child: TextField(
+            readOnly: true,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: AppConstants.scaffoldGrey,
+              hintText: 'Search by Keyword',
+              hintStyle: const TextStyle(
+                color: AppConstants.textGrey,
+                fontSize: 13,
+              ),
+              prefixIcon: const Icon(
+                Icons.search,
+                color: AppConstants.textGrey,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(vertical: 12),
+            ),
           ),
-          prefixIcon: const Icon(Icons.search, color: AppConstants.textGrey),
-          suffixIcon: Obx(
-            () => controller.searchQuery.isEmpty
-                ? const Icon(Icons.search, color: AppConstants.textGrey)
-                : IconButton(
-                    tooltip: 'Clear search',
-                    onPressed: () => controller.updateSearchQuery(''),
-                    icon: const Icon(Icons.close),
-                  ),
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 12),
         ),
       ),
     );
@@ -357,40 +355,50 @@ class _FeaturedRow extends StatelessWidget {
         return Expanded(
           child: Padding(
             padding: const EdgeInsets.only(right: 6),
-            child: AspectRatio(
-              aspectRatio: 0.75,
-              child: ClipRRect(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
                 borderRadius: BorderRadius.circular(6),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    AppNetworkImage(
-                      imageUrl: product.thumbnail,
-                      fit: BoxFit.cover,
-                    ),
-                    Positioned(
-                      left: 5,
-                      bottom: 5,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 5,
-                          vertical: 3,
+                onTap: () => Get.toNamed(
+                  AppRoutes.productDetails,
+                  arguments: product,
+                ),
+                child: AspectRatio(
+                  aspectRatio: 0.75,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        AppNetworkImage(
+                          imageUrl: product.thumbnail,
+                          fit: BoxFit.cover,
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.65),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          '₹${product.price.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
+                        Positioned(
+                          left: 5,
+                          bottom: 5,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.65),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              PriceFormatter.format(product.price),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -779,7 +787,7 @@ class _ProductGridSliver extends StatelessWidget {
           itemCount: visibleProducts.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            childAspectRatio: 0.55,
+            childAspectRatio: 0.52,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
           ),

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:getx/app/constants/app_constants.dart';
 import 'package:getx/app/controller/wishlist_controller.dart';
 import 'package:getx/app/routes/app_routes.dart';
+import 'package:getx/app/utils/price_formatter.dart';
 import 'package:getx/app/views/widgets/app_network_image.dart';
 
 class WishlistView extends StatelessWidget {
@@ -59,7 +60,7 @@ class WishlistView extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                subtitle: Text('₹${product.price.toStringAsFixed(0)}'),
+                subtitle: Text(PriceFormatter.format(product.price)),
                 trailing: IconButton(
                   tooltip: 'Remove from wishlist',
                   onPressed: () => wishlist.remove(product),

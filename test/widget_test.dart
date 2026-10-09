@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
 import 'package:getx/app/routes/app_routes.dart';
+import 'package:getx/app/di/service_locator.dart';
 import 'package:getx/main.dart';
 
 void main() {
@@ -13,7 +14,8 @@ void main() {
   setUpAll(() async {
     hiveDirectory = Directory.systemTemp.createTempSync('getx_store_test_');
     Hive.init(hiveDirectory.path);
-    await Hive.openBox<String>('getx_store');
+    final box = await Hive.openBox<String>('getx_store');
+    configureDependencies(box);
   });
 
   tearDownAll(() async {

@@ -9,7 +9,7 @@ class ApiService {
   Future<List<Product>> fetchProducts() async {
     final uri = Uri.parse(
       AppConstants.productsUrl,
-    ).replace(queryParameters: {'limit': '20', 'skip': '0'});
+    ).replace(queryParameters: {'limit': '0', 'skip': '0'});
     return _fetchProductList(uri);
   }
 

@@ -6,6 +6,7 @@ import 'package:getx/app/controller/cart_controller.dart';
 import 'package:getx/app/models/cart_item.dart';
 import 'package:getx/app/routes/app_routes.dart';
 import 'package:getx/app/utils/app_snackbar.dart';
+import 'package:getx/app/utils/price_formatter.dart';
 import 'package:getx/app/views/widgets/app_network_image.dart';
 import 'package:getx/app/views/widgets/quantity_stepper.dart';
 
@@ -102,7 +103,7 @@ class _DeliveryAddress extends StatelessWidget {
           const SizedBox(width: 7),
           const Expanded(
             child: Text(
-              'Delivery at Coimbatore - 641035',
+              'Delivery at Kochi - 641035',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
@@ -184,14 +185,14 @@ class _CartItemCard extends StatelessWidget {
                         spacing: 6,
                         children: [
                           Text(
-                            '₹${currentPrice.toStringAsFixed(0)}',
+                            PriceFormatter.format(currentPrice),
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                           Text(
-                            '₹${originalPrice.toStringAsFixed(0)}',
+                            PriceFormatter.format(originalPrice),
                             style: const TextStyle(
                               color: AppConstants.textGrey,
                               fontSize: 11,
@@ -217,6 +218,9 @@ class _CartItemCard extends StatelessWidget {
                             value: item.quantity,
                             onDecrease: () => controller.decreaseItem(item),
                             onIncrease: () => controller.increaseItem(item),
+                            isDecreaseEnabled: item.quantity > 1,
+                            isIncreaseEnabled:
+                                item.quantity < item.product.stock,
                             height: 32,
                             buttonSize: 30,
                             iconSize: 15,
@@ -262,7 +266,7 @@ class _CartItemCard extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child:                   _ItemAction(
+                  child: _ItemAction(
                     icon: Icons.favorite_border,
                     label: 'Move to Wishlist',
                     onTap: () => controller.moveToWishlist(item),
@@ -350,12 +354,12 @@ class _PriceDetails extends StatelessWidget {
           const SizedBox(height: 14),
           _PriceRow(
             label: 'Product Price',
-            value: '+ ₹${productPrice.toStringAsFixed(0)}',
+            value: '+ ${PriceFormatter.format(productPrice)}',
           ),
           const SizedBox(height: 10),
           _PriceRow(
             label: 'Total Discounts',
-            value: '- ₹${discount.toStringAsFixed(0)}',
+            value: '- ${PriceFormatter.format(discount)}',
             color: AppConstants.meeshoGreen,
           ),
           const SizedBox(height: 10),
@@ -363,7 +367,7 @@ class _PriceDetails extends StatelessWidget {
             label: 'Delivery Charge',
             value: controller.deliveryCharge == 0
                 ? 'Free'
-                : '+ ₹${controller.deliveryCharge.toStringAsFixed(0)}',
+                : '+ ${PriceFormatter.format(controller.deliveryCharge)}',
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
@@ -371,7 +375,7 @@ class _PriceDetails extends StatelessWidget {
           ),
           _PriceRow(
             label: 'Order Total',
-            value: '₹${controller.grandTotal.toStringAsFixed(0)}',
+            value: PriceFormatter.format(controller.grandTotal),
             bold: true,
           ),
         ],
@@ -453,7 +457,7 @@ class _StickyCheckoutBar extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '₹${controller.grandTotal.toStringAsFixed(0)}',
+                      PriceFormatter.format(controller.grandTotal),
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,

@@ -22,7 +22,6 @@ void main() {
   setUp(() async {
     Get.testMode = true;
     await box.clear();
-    Get.put(LocalStorageService(box));
   });
 
   tearDown(() async {
@@ -36,11 +35,13 @@ void main() {
   });
 
   test('cart is restored from Hive after controller recreation', () async {
-    final cart = Get.put(CartController());
+    final cart = Get.put(CartController(storage: LocalStorageService(box)));
     await cart.addToCart(_product, quantity: 2);
 
     await Get.delete<CartController>();
-    final restoredCart = Get.put(CartController());
+    final restoredCart = Get.put(
+      CartController(storage: LocalStorageService(box)),
+    );
 
     expect(restoredCart.cartItems, hasLength(1));
     expect(restoredCart.cartItems.single.product.title, _product.title);
@@ -49,18 +50,22 @@ void main() {
   });
 
   test('wishlist is restored from Hive after controller recreation', () async {
-    final wishlist = Get.put(WishlistController());
+    final wishlist = Get.put(
+      WishlistController(storage: LocalStorageService(box)),
+    );
     expect(await wishlist.add(_product), isTrue);
 
     await Get.delete<WishlistController>();
-    final restoredWishlist = Get.put(WishlistController());
+    final restoredWishlist = Get.put(
+      WishlistController(storage: LocalStorageService(box)),
+    );
 
     expect(restoredWishlist.products, hasLength(1));
     expect(restoredWishlist.products.single.title, _product.title);
   });
 
   test('clearing cart removes both reactive and persisted cart data', () async {
-    final cart = Get.put(CartController());
+    final cart = Get.put(CartController(storage: LocalStorageService(box)));
     await cart.addToCart(_product);
 
     await cart.clearCart();

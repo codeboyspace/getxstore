@@ -10,6 +10,7 @@ import 'package:getx/app/views/pages/checkout_view.dart';
 import 'package:getx/app/views/pages/home_view.dart';
 import 'package:getx/app/views/pages/order_success_view.dart';
 import 'package:getx/app/views/pages/product_details_view.dart';
+import 'package:getx/app/views/pages/search_view.dart';
 import 'package:getx/app/views/pages/wishlist_view.dart';
 import 'app_routes.dart';
 
@@ -19,6 +20,10 @@ class AppPages {
       name: AppRoutes.home,
       page: () => const HomeView(),
       binding: HomeBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.search,
+      page: () => const SearchView(),
     ),
     GetPage(
       name: AppRoutes.categories,

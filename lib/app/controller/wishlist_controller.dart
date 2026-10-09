@@ -10,8 +10,11 @@ import 'package:getx/app/utils/app_snackbar.dart';
 
 class WishlistController extends GetxController {
   static const _storageKey = 'wishlist_products';
-  final LocalStorageService _storage = Get.find<LocalStorageService>();
+  final LocalStorageService _storage;
   final products = <Product>[].obs;
+
+  WishlistController({required LocalStorageService storage})
+    : _storage = storage;
 
   @override
   void onInit() {

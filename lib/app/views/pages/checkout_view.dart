@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:getx/app/constants/app_constants.dart';
 import 'package:getx/app/controller/cart_controller.dart';
 import 'package:getx/app/controller/checkout_controller.dart';
+import 'package:getx/app/utils/price_formatter.dart';
 
 class CheckoutView extends StatelessWidget {
   const CheckoutView({super.key});
@@ -35,7 +36,7 @@ class CheckoutView extends StatelessWidget {
                   title: Text(item.product.title),
                   subtitle: Text('Quantity: ${item.quantity}'),
                   trailing: Text(
-                    '₹${(item.product.price * item.quantity).toStringAsFixed(0)}',
+                    PriceFormatter.format(item.product.price * item.quantity),
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -117,7 +118,7 @@ class _SummaryRow extends StatelessWidget {
       children: [
         Text(label, style: style),
         Text(
-          freeIfZero && value == 0 ? 'Free' : '₹${value.toStringAsFixed(0)}',
+          freeIfZero && value == 0 ? 'Free' : PriceFormatter.format(value),
           style: style,
         ),
       ],
